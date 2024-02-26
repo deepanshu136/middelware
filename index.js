@@ -1,6 +1,7 @@
 const express=require('express');
 const app=express();
 const morgan=require('morgan');
+const AppError=require('./Apperror')
  
 //deriving my middleware
 app.use(morgan('dev'))
@@ -23,10 +24,16 @@ const authentication=(req,res,next)=>{
     const {password}=req.query;
     if(password==='ninja'){
         next();
-    }else{
-        res.status(401).send('sorry you need a password');
+     }
+     throw new AppError('password required',401); 
+     //else{
+    //     res.status(401).send('sorry you need a password');
+    // }
+    // throw new Error('sorry need to enter a password');
+    
+    
     }
-};
+
 
 
 // app.use((req,res,next)=>{
@@ -46,9 +53,16 @@ const authentication=(req,res,next)=>{
 
 
 
+
+
+
 app.get('/',(req,res)=>{
     //console.log(req.requestTime)
     res.send("IT WORKED")
+})
+
+app.get('/error',(req,res)=>{
+    chicken.fly()
 })
 
 app.get('/dogs',(req,res)=>{
@@ -59,9 +73,19 @@ app.get('/secret',authentication,(req,res)=>{
     res.send("It is highly classisfied secret that i dring black coffe at late night")
 })
 
+
+
 //using middelware to show 404 error
 app.use((req,res)=>{
     res.status(404).send(' Not Found')
+})
+
+
+//defining custom error handler
+app.use((err,req,res,next)=>{
+    console.log('******Error******')
+    // res.status(500).send("Ih boy it s vulnerable error")
+    next(err)
 })
 
 app.listen(3000,()=>{
